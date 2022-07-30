@@ -5,8 +5,8 @@ const router = express.Router();
 /* Create a database connection */
 const db = mysql.createConnection({
   user: 'admin',
-  host: 'quiz-web-app.ckgroq2ja5kv.us-east-2.rds.amazonaws.com',
-  password: 'literacy1995',
+  host: 'quizwebappdb.cbriwp0julvl.us-east-1.rds.amazonaws.com',
+  password: 'Pipe1inePred@tors',
   database: 'quizwebappdb'
 })
 
