@@ -5,10 +5,10 @@ const router = express.Router();
 
 /* Create a database connection */
 const db = mysql.createConnection({
-  user: 'admin',
-  host: 'quizzlerwebappdb.cbriwp0julvl.us-east-1.rds.amazonaws.com',
-  password: 'avitorpa$$word1995',
-  database: 'quizwebappdb'
+  user: process.env.SQLUSER,
+  host: process.env.SQLHOST,
+  password: process.env.SQLPASSWORD,
+  database: process.env.SQLDATABASE
 })
 
 /* GET home page. */
