@@ -61,16 +61,34 @@ router.post('/api/create_student', function (req, res) {
   }
 
   db.query("INSERT INTO quizwebappdb.student (firstname,lastname,birthdate,email,password) VALUES (?,?,?,?,?)",
-  [studentDetails.firstname,studentDetails.lastname,studentDetails.birthdate,studentDetails.email,studentDetails.password], 
-  (err, result) => {
-    if (err) {
-      console.log('Error', err)
-      res.send(err)
-    } else {
-      console.log('This is the result', result)
-      res.status(200).send('Data successfully added')
-    }
-  })
+    [studentDetails.firstname, studentDetails.lastname, studentDetails.birthdate, studentDetails.email, studentDetails.password],
+    (err, result) => {
+      if (err) {
+        console.log('Error', err)
+        res.send(err)
+      } else {
+        console.log('This is the result', result)
+        res.status(200).send('Data successfully added')
+      }
+    })
 })
+
+router.post('/api/create_customer', function (req, res) {
+  const name = req.body.name;
+  const address = req.body.address;
+
+  db.query("INSERT INTO quizwebappdb.customer (name,address) VALUES (?,?)",
+    [name, address],
+    (err, result) => {
+      if (err) {
+        console.log('Error', err)
+        res.send(err)
+      } else {
+        console.log('This is the result', result)
+        res.status(200).send('Data successfully added')
+      }
+    })
+}
+)
 
 module.exports = router;
