@@ -6,7 +6,6 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-var session = require('express-session');
 const cors = require('cors');
 
 
@@ -26,11 +25,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(session({
-  resave: false,
-  saveUninitialized:false,
-  secret: 'shhh,very secret'
-}))
 
 app.use('/', indexRouter);
 app.use('/student', studentRouter);
@@ -51,17 +45,5 @@ app.use(function (err, req, res) {
   res.render('error');
 });
 
-
-//Session-persisted message middleware
-app.use(function (req, res, next) {
-  var err = req.session.error;
-  var msg = req.session.success;
-  delete req.session.error;
-  delete req.session.success;
-  res.locals.message = '';
-  if (err) res.locals.message = err.message;
-  if (msg) res.locals.message = msg;
-  next()
-})
 
 module.exports = app;

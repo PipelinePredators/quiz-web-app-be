@@ -23,14 +23,19 @@ const db = mysql.createConnection({
 const createStudentQuery = (studentDetails, res) => {
 
     db.query("CALL create_student(?,?,?,?,?,?)",
-        [studentDetails.firstname, studentDetails.lastname, studentDetails.birthdate, studentDetails.email, studentDetails.password,studentDetails.salt],
+        [
+            studentDetails.firstname,
+            studentDetails.lastname,
+            studentDetails.email,
+            studentDetails.phonenumber,
+            studentDetails.password,
+            studentDetails.salt
+        ],
         (err, result) => {
             if (err) {
-                console.log('Error', err)
-                if (err.code === 'ER_DUP_ENTRY') res.send("User already exists")
+                if (err.code === 'ER_DUP_ENTRY') res.json({"status":"failed","message":"Email or phone number already exist"})
             } else {
-                console.log('This is the result', result)
-                res.status(200).send('Data successfully added')
+                res.status(200).json({"status":"success","message":"Registration Successful"});
             }
         })
 }
@@ -44,19 +49,16 @@ const createStudentQuery = (studentDetails, res) => {
  * @param fn - callback function
  */
 const authenticate = (email, pass, fn) => {
-    console.log('Email Authenticate',email)
-    console.log('Password Authenticate',pass)
+    console.log('Email Authenticate', email)
+    console.log('Password Authenticate', pass)
     db.query("CALL login_student(?)",
         [email],
         (err, result) => {
             if (err) throw err;
             if (!result[0][0]) return fn(null, null);
             let student = result[0][0];
-            console.log('Student',student)
-            hash({ password: pass,salt:student.salt }, function (err, pass, salt, hash) {
+            hash({ password: pass, salt: student.salt }, function (err, pass, salt, hash) {
                 if (err) return fn(err);
-                console.log('Hashed password',hash)
-                console.log('Password',student.password)
                 if (hash === student.password) return fn(null, student);
                 fn(null, null);
             })
@@ -74,10 +76,10 @@ router.post('/api/create_student', function (req, res) {
         const studentDetails = {
             firstname: req.body.firstname,
             lastname: req.body.lastname,
-            birthdate: req.body.birthdate,
             email: req.body.email,
+            phonenumber: req.body.phonenumber,
             password: hash,
-            salt:salt
+            salt: salt
         }
         createStudentQuery(studentDetails, res);
     })
@@ -91,11 +93,9 @@ router.delete('/api/delete_student', function (req, res) {
         [studentId],
         (err, result) => {
             if (err) {
-                console.log("Error", err)
-                res.send("Update failed")
+                res.json("Update failed")
             } else {
-                console.log('Delete student', result)
-                res.status(200).send('Student deleted successfully')
+                res.status(200).json('Student deleted successfully')
             }
         }
     )
@@ -109,11 +109,9 @@ router.patch('/api/update_birthdate', function (req, res) {
         [studentId, birthdate],
         (err, result) => {
             if (err) {
-                console.log("Error", err)
-                res.send("Update failed")
+                res.json("Update failed")
             } else {
-                console.log('Update birthdate', result)
-                res.status(200).send('Birthdate updated successfully')
+                res.status(200).json('Birthdate updated successfully')
             }
         }
     )
@@ -128,11 +126,9 @@ router.patch('/api/update_email', function (req, res) {
         [studentId, email],
         (err, result) => {
             if (err) {
-                console.log("Error", err)
-                if (err.code === 'ER_DUP_ENTRY') res.send("User already exists")
+                if (err.code === 'ER_DUP_ENTRY') res.json("User already exists")
             } else {
-                console.log('Update Email', result)
-                res.status(200).send('Email updated successfully')
+                res.status(200).json('Email updated successfully')
             }
         }
     )
@@ -145,11 +141,9 @@ router.patch('/api/update_password', function (req, res) {
         [studentId, currentPassword],
         (err, result) => {
             if (err) {
-                console.log("Error", err)
-                res.send("Update failed")
+                res.json("Update failed")
             } else {
-                console.log('Update birthdate', result)
-                res.status(200).send('Birthdate updated successfully')
+                res.status(200).json('Birthdate updated successfully')
             }
         }
     )
@@ -160,28 +154,12 @@ function. */
 router.get('/api/login_student', function (req, res) {
     const email = req.query.email;
     const password = req.query.password;
-    console.log('email', email)
-    console.log('Password', password)
     authenticate(email, password, function (err, student) {
-        if (err) res.send(err);
-        if (student) {
-            req.session.regenerate(function () {
-                req.session.student = student;
-                req.session.success = `Welcome ${student.firstname} ${student.lastname}`
-            });
-            res.send(student)
-        } else {
-            req.session.error = 'Authentication failed, please check your credentials'
-        }
+        if (err) res.json(err);
+        const { token } = student;
+        res.json({ "token": token });
+
     })
 })
-
-/* Destroying the session. */
-router.get('/api/logout', function (req, res) {
-    req.session.destroy(function () {
-        res.redirect('/')
-    });
-})
-
 
 module.exports = router;
