@@ -22,8 +22,8 @@ router.get('/api/fetch_subjects', (req, res) => {
                 return
             } else {
                 const data = result[0].map((quiz) => {
-                    const { id, name } = quiz;
-                    return { id, name }
+                    const { id, name,description } = quiz;
+                    return { id, name,description }
                 })
                 res.json({ data: data });
                 return
