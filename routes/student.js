@@ -33,9 +33,10 @@ const createStudentQuery = (studentDetails, res) => {
         ],
         (err, result) => {
             if (err) {
-                if (err.code === 'ER_DUP_ENTRY') res.json({"status":"failed","message":"Email or phone number already exist"})
+                if (err.code === 'ER_DUP_ENTRY') {res.json({"status":"failed","message":"Email or phone number already exist"}); return}
             } else {
                 res.status(200).json({"status":"success","message":"Registration Successful"});
+                return
             }
         })
 }
@@ -49,8 +50,7 @@ const createStudentQuery = (studentDetails, res) => {
  * @param fn - callback function
  */
 const authenticate = (email, pass, fn) => {
-    console.log('Email Authenticate', email)
-    console.log('Password Authenticate', pass)
+   
     db.query("CALL login_student(?)",
         [email],
         (err, result) => {
@@ -94,8 +94,10 @@ router.delete('/api/delete_student', function (req, res) {
         (err, result) => {
             if (err) {
                 res.json("Update failed")
+                return
             } else {
                 res.status(200).json('Student deleted successfully')
+                return
             }
         }
     )
@@ -110,8 +112,10 @@ router.patch('/api/update_birthdate', function (req, res) {
         (err, result) => {
             if (err) {
                 res.json("Update failed")
+                return
             } else {
                 res.status(200).json('Birthdate updated successfully')
+                return
             }
         }
     )
@@ -126,9 +130,16 @@ router.patch('/api/update_email', function (req, res) {
         [studentId, email],
         (err, result) => {
             if (err) {
-                if (err.code === 'ER_DUP_ENTRY') res.json("User already exists")
+                if (err.code === 'ER_DUP_ENTRY'){ 
+                    res.json("User already exists")
+                    return
+                }
             } else {
-                res.status(200).json('Email updated successfully')
+                const content = {
+                    data:result
+                }
+                res.status(200).json(content)
+                return
             }
         }
     )
@@ -142,8 +153,10 @@ router.patch('/api/update_password', function (req, res) {
         (err, result) => {
             if (err) {
                 res.json("Update failed")
+                return
             } else {
                 res.status(200).json('Birthdate updated successfully')
+                return
             }
         }
     )
@@ -155,9 +168,10 @@ router.get('/api/login_student', function (req, res) {
     const email = req.query.email;
     const password = req.query.password;
     authenticate(email, password, function (err, student) {
-        if (err) res.json(err);
+        if (err) {res.json(err); return};
         const { token } = student;
         res.json({ "token": token });
+        return
 
     })
 })
