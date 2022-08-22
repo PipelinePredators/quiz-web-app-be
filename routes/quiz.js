@@ -14,6 +14,7 @@ const db = mysql.createConnection({
 
 
 //TODO: Fetch subjects
+/* A function that is called when the user visits the route `/api/fetch_subjects` */
 router.get('/api/fetch_subjects', (req, res) => {
     db.query("CALL fetch_subjects()",
         (err, result) => {
@@ -22,8 +23,8 @@ router.get('/api/fetch_subjects', (req, res) => {
                 return
             } else {
                 const data = result[0].map((quiz) => {
-                    const { id, name,description } = quiz;
-                    return { id, name,description }
+                    const { id, name, description } = quiz;
+                    return { id, name, description }
                 })
                 res.json({ data: data });
                 return
