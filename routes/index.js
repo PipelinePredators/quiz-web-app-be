@@ -4,13 +4,13 @@ const mysql = require('mysql2');
 const router = express.Router();
 
 
-/* Create a database connection */
+/*Create a database connection */
 const db = mysql.createConnection({
   user: process.env.SQLUSER,
-  host: process.env.SQLHOST,
+  host:process.env.SQLHOST,
   password: process.env.SQLPASSWORD,
-  database: process.env.SQLDATABASE
-})
+  database: process.env.SQLDATABASE,
+}); 
 
 /* GET home page. */
 router.get('/', function (req, res) {
