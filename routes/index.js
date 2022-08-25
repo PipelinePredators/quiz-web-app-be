@@ -4,7 +4,8 @@ const mysql = require('mysql2');
 const router = express.Router();
 
 
-/*Create a database connection */
+
+/* Create a database connection */
 const db = mysql.createConnection({
   user: process.env.SQLUSER,
   host:process.env.SQLHOST,
@@ -14,17 +15,22 @@ const db = mysql.createConnection({
 
 /* GET home page. */
 router.get('/', function (req, res) {
-  
+  res.render('index', { title: 'Pipeline Predators' });
+});
+
+/* GET home page. */
+router.get('/api/all_students', function (req, res) {
+
   //Get data from database
   db.query(
     'SELECT * FROM student',
     (err, result) => {
-      if (err) {
-        console.log(err)
-      } else {
-        console.log('This is the result',result)
-        res.status(200).send(result)
-      }
+      if (err) throw err
+      const data = result.map((elements) => {
+        const { id, firstname, lastname, birthdate, email } = elements
+        return { id, firstname, lastname, birthdate, email };
+      })
+      res.status(200).json(data)
     }
   )
 });
