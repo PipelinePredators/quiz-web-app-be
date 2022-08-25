@@ -12,6 +12,11 @@ const db = mysql.createConnection({
 })
 
 /* GET home page. */
+router.get('/', function (req, res) {
+  res.render('index', { title: 'Pipeline Predators' });
+});
+
+/* GET home page. */
 router.get('/api/all_students', function (req, res) {
 
   //Get data from database
