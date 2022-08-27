@@ -24,7 +24,7 @@ db.connect(function(err){
     console.log("Succesfully connected to database");
 })
 
-router.get('/subjects/:subject_id/:limit', (req, res) => {
+router.get('/api/subjects/:subject_id/:limit', (req, res) => {
     console.log(req.param.id);
     const reqDetails ={
         subject_id : req.params.subject_id,
