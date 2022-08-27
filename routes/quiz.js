@@ -2,9 +2,7 @@
 const express = require("express");
 const mysql = require("mysql2");
 const router = express.Router();
-require('dotenv').config()
-var express = require('express');
-const mysql = require('mysql2');
+require('dotenv').config();
 
 
 
