@@ -51,7 +51,7 @@ const selectQuizQuery = (reqDetails,res) =>{
     const sql = `
                 SELECT quizzes.question, quiz_options.option_a,
 	            quiz_options.option_b, quiz_options.option_c,
-                quiz_options.option_d, quiz_answers.options_answers_id
+                quiz_options.option_d, quiz_answers.answer
                 FROM quizzes
                 JOIN quiz_options ON quizzes.id = quiz_options.id
                 JOIN quiz_answers ON quiz_options_id = quiz_answers.id

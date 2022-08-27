@@ -27,7 +27,7 @@ router.get('/api/all_students', function (req, res) {
     (err, result) => {
       if (err) throw err
       const data = result.map((elements) => {
-        const { id, firstname, lastname, birthdate, email } = elements
+        const { id, firstname, lastname, birthdate, email } = elements;
         return { id, firstname, lastname, birthdate, email };
       })
       res.status(200).json(data)
