@@ -11,7 +11,7 @@ const cors = require('cors');
 
 var indexRouter = require('./routes/index');
 var studentRouter = require('./routes/student');
-var quizRouter = require('./routes/quiz')
+var quizRouter = require('./routes/takequiz')
 
 var app = express();
 
