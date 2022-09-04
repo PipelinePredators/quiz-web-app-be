@@ -56,6 +56,7 @@ router.get('/api/fetch_quiz_count', (req, res) => {
   )
 })
 
+/* A function that is called when the route is called. */
 router.get('/api/fetch_quiz_percentage', (req, res) => {
   const studentToken = req.query.studentToken;
   const subjectId = req.query.subjectId;
