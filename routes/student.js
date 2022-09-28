@@ -33,9 +33,9 @@ const createStudentQuery = (studentDetails, res) => {
         ],
         (err, result) => {
             if (err) {
-                if (err.code === 'ER_DUP_ENTRY') {res.json({"status":"failed","message":"Email or phone number already exist"}); return}
+                if (err.code === 'ER_DUP_ENTRY') { res.json({ "status": "failed", "message": "Email or phone number already exist" }); return }
             } else {
-                res.status(200).json({"status":"success","message":"Registration Successful"});
+                res.status(200).json({ "status": "success", "message": "Registration Successful" });
                 return
             }
         })
@@ -50,7 +50,7 @@ const createStudentQuery = (studentDetails, res) => {
  * @param fn - callback function
  */
 const authenticate = (email, pass, fn) => {
-   
+
     db.query("CALL login_student(?)",
         [email],
         (err, result) => {
@@ -130,13 +130,13 @@ router.patch('/api/update_email', function (req, res) {
         [studentId, email],
         (err, result) => {
             if (err) {
-                if (err.code === 'ER_DUP_ENTRY'){ 
+                if (err.code === 'ER_DUP_ENTRY') {
                     res.json("User already exists")
                     return
                 }
             } else {
                 const content = {
-                    data:result
+                    data: result
                 }
                 res.status(200).json(content)
                 return
@@ -168,12 +168,16 @@ router.get('/api/login_student', function (req, res) {
     const email = req.query.email;
     const password = req.query.password;
     authenticate(email, password, function (err, student) {
-        if (err) {res.json(err); return};
-        const { token } = student;
-        res.json({ "token": token });
+        if (err) { res.json(err); return };
+        if (student !== null) {
+            const { token } = student;
+            res.json({ "token": token });
+        }
+        res.json({ "token": '' })
         return
 
     })
 })
+
 
 module.exports = router;
