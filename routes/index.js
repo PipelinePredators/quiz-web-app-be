@@ -32,5 +32,4 @@ router.get('/api/all_students', function (req, res) {
     }
   )
 });
-
 module.exports = router;
