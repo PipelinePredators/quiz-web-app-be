@@ -37,24 +37,16 @@ the data from the form and sends it to the database. */
 router.post('/api/create_quiz', (req, res) => {
     const quizDetails = {
         subjectId: req.body.subjectId,
-        question: req.body.question,
-        firstOption: req.body.firstOption,
-        secondOption: req.body.secondOption,
-        thirdOption: req.body.thirdOption,
-        fourthOption: req.body.fourthOption,
-        questionAnswer: req.body.questionAnswer
+        questions: req.body.questions
     }
 
-    db.query("CALL add_quiz(?,?,?,?,?,?,?)",
-        [
-            quizDetails.subjectId,
-            quizDetails.question,
-            quizDetails.firstOption,
-            quizDetails.secondOption,
-            quizDetails.thirdOption,
-            quizDetails.fourthOption,
-            quizDetails.questionAnswer
-        ],
+    const arrayOfQuestions = parseArrayOfQuestions(quizDetails);
+    const questionObj = {
+        quizzes: arrayOfQuestions
+    }
+    const stringifyArray = JSON.stringify(questionObj);
+    db.query('CALL insert_quiz(?)',
+        [stringifyArray],
         (err, result) => {
             if (err) {
                 if (err.code === 'ER_DUP_ENTRY') {
@@ -73,6 +65,62 @@ router.post('/api/create_quiz', (req, res) => {
     )
 })
 
+/* A delete request that is called when the user clicks the delete button. It takes the subject id and
+sends it to the database. */
+router.delete('/api/delete_all_quiz/:subjectIdNo', (req, res) => {
+    const subjectIDNo = req.params.subjectIdNo;
+    console.log('Subject ', subjectIDNo);
+    db.query('CALL delete_all_questions(?)',
+        [subjectIDNo],
+        (err, result) => {
+            if (err) {
+                res.json({ status: 'failed', message: 'Unable to delete at this time' })
+                return;
+            } else {
+                res.json({ status: 'Success', message: 'Questions deleted' })
+            }
+        })
+})
+
+/**
+ * It takes an object with a property called 'questions' which is an array of objects, and returns an
+ * array of arrays.
+ * @param quizDetails - {
+ */
+function parseArrayOfQuestions(quizDetails) {
+    let arrayOfQuestions = [];
+    quizDetails.questions.forEach((question) => {
+        let questionArray = {
+            subjectId: quizDetails.subjectId,
+            question: question['Question'],
+            optionA: question['Option A'],
+            optionB: question['Option B'],
+            optionC: question['Option C'],
+            optionD: question['Option D'],
+            answer: parseAnswers(question['Answer'])
+        };
+        arrayOfQuestions.push(questionArray);
+    });
+
+    return arrayOfQuestions;
+}
+
+function parseAnswers(answers) {
+    switch (answers) {
+        case 'A':
+            return 1;
+        case 'B':
+            return 2;
+        case 'C':
+            return 3;
+        case 'D':
+            return 4
+        default:
+            return
+    }
+}
+
+
 /* A get request that is called when the user clicks the take quiz button. It takes the subject id and
 the question number from the user and sends it to the database. */
 router.get('/api/fetch_quiz', (req, res) => {
@@ -85,7 +133,7 @@ router.get('/api/fetch_quiz', (req, res) => {
         [userPreferences.subjectId, userPreferences.questionNumber],
         (err, result) => {
             if (err) {
-                res.json({ error: err })
+                res.json({ status: 'failed', message: err })
                 return;
             } else {
                 const data = result[0].map((quiz) => {
@@ -100,7 +148,7 @@ router.get('/api/fetch_quiz', (req, res) => {
                     }
                 })
 
-                res.json(data)
+                res.json({ status: 'success', message: 'Questions loaded successfully', data: data})
                 return;
             }
         }
@@ -111,7 +159,7 @@ router.get('/api/fetch_quiz', (req, res) => {
 //Save Quiz Results
 router.post('/api/save_results', (req, res) => {
     const date = new Date();
-    const quizDate = date.toJSON().slice(0,10);
+    const quizDate = date.toJSON().slice(0, 10);
     const results = {
         studentToken: req.body.studentToken,
         currentScore: req.body.currentScore,
@@ -121,7 +169,7 @@ router.post('/api/save_results', (req, res) => {
     }
 
     db.query("CALL save_quiz_results(?,?,?,?,?)",
-        [results.studentToken, results.currentScore, results.quizTotal,results.takeQuizDate,results.subjectId],
+        [results.studentToken, results.currentScore, results.quizTotal, results.takeQuizDate, results.subjectId],
         (err, result) => {
             if (err) {
                 res.json(err)
@@ -134,10 +182,9 @@ router.post('/api/save_results', (req, res) => {
 })
 
 
-//TODO: Update quiz
-
 //TODO: Delete quiz
 
 
 
 module.exports = router;
+
