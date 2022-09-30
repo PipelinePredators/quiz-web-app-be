@@ -171,9 +171,10 @@ router.get('/api/login_student', function (req, res) {
         if (err) { res.json(err); return };
         if (student !== null) {
             const { token } = student;
-            res.json({ "token": token });
+            res.json({ "token": token, "student": student });
+            return
         }
-        res.json({ "token": '' })
+        res.json({ "token": '', "student": '' })
         return
 
     })
